@@ -74,29 +74,24 @@ const Index = class Index extends React.Component {
         <div className="input-area" style={{
         }}>
 
-          <ul style={{padding: 0, margin: 0}}>
-            <li style={{listStyle: 'none'}}><a href="#">
-              <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                <div style={{width: 50, height: 50, overflow: 'hidden'}}>
-                  <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
-                </div>
-                <div className="message" style={{  }}>
-                  <p>fefe</p>
-                </div>
-              </div>
-            </a></li>
-            <li style={{listStyle: 'none'}}><a href="#">
-              <div style={{ display: 'flex', alignItems: 'flex-start', alignSelf: 'flex-start' }}>
-                <div style={{width: 50, height: 50, overflow: 'hidden'}}>
-                  <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
-                </div>
-                <div className="message" style={{ alignSelf: 'center' }}>
-                  <p>fefe</p>
-                </div>
-              </div>
-            </a></li>
-          </ul>
 
+
+          <ul style={{padding: 0, margin: 0}}>
+            {this.state.datas.map((data) => {
+              return(
+                <li style={{listStyle: 'none'}}><a href="#">
+                  <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                    <div style={{width: 50, height: 50, overflow: 'hidden'}}>
+                      <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
+                    </div>
+                    <div className="message" style={{  }}>
+                      <p>{ data }</p>
+                    </div>
+                  </div>
+                </a></li>
+              );
+            })}
+          </ul>
         </div>
 
         <div className="input-area">
