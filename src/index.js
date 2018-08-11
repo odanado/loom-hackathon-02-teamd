@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Contract from './contract'
+import createKeccakHash from 'keccak'
 
 const Index = class Index extends React.Component {
   constructor(props) {
@@ -15,9 +16,10 @@ const Index = class Index extends React.Component {
       value: 0,
       isValid: false,
       isSending: false,
-      tx: null,
       tries: 0,
-      messages: [],
+      messages: [
+        {timestamp: 0, stamp: 1}
+      ],
       isStamp: false
     }
   }
@@ -58,17 +60,19 @@ const Index = class Index extends React.Component {
     } else if (genreA < genreB) {
       comparison = -1;
     }
-    return comparison * -1;
+    return comparison;
+  }
+
+  getDNA(x) {
+    return createKeccakHash('keccak256').update(String(x)).digest('hex').substring(0, 6)
   }
 
   async SendText() {
     this.setState({isSending: true})
     try {
       const tx = await this.contract.sendText(this.value)
-      console.log(tx);
       this.textInput.current.value = ''
       this.setState({
-        tx,
         isValid: false
       })
     } catch (err) {
@@ -78,16 +82,18 @@ const Index = class Index extends React.Component {
   }
 
 
-  // async SendStamp(stamp) {
-  //   this.setState({isSending: true})
-  //   try {
-  //     const tx = await this.contract.mintColorStampToken()
-  //     this.setState({ tx })
-  //   } catch (err) {
-  //     console.error('Ops, some error happen:', err)
-  //   }
-  //   this.setState({isSending: false})
-  // }
+  async SendStamp(stamp) {
+    this.setState({isSending: true})
+    try {
+      const tx = await this.contract.mintColorStampToken()
+      this.setState({
+        isValid: false
+      })
+    } catch (err) {
+      console.error('Ops, some error happen:', err)
+    }
+    this.setState({isSending: false})
+  }
 
   render() {
     const loomyAlert = (
@@ -117,16 +123,24 @@ const Index = class Index extends React.Component {
           <div className="message-area">
             <h2>タイムライン</h2>
             <ul style={{padding: 0, margin: 0}}>
-              {this.state.messages.sort(this.comparison).map((message) => {
+              {this.state.messages.sort(this.compare).map((message) => {
                 return(
-                  <li style={{listStyle: 'none'}}><a href="#">
+                  <li style={{listStyle: 'none', padding: '8px'}}><a href="#">
                     <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                      <div style={{width: 50, height: 50, overflow: 'hidden'}}>
+                      <div style={{width: 50, height: 50, overflow: 'hidden', marginRight: "24px"}}>
                         <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
                       </div>
-                      <div className="message">
-                        <p>{ message.text }</p>
-                      </div>
+                      {
+                        message.text ? 
+                        (
+                          <div className="message">
+                            <p>{ message.text }</p>
+                          </div>
+                        ) :
+                        (
+                          <div style={{width: 50, height: 50, backgroundColor: `#${this.getDNA(message.stamp)}`}}/>
+                        )
+                      }
                     </div>
                   </a></li>
                 );
