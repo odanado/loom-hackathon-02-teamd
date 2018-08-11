@@ -83,15 +83,15 @@ const Index = class Index extends React.Component {
 
 
           <ul style={{padding: 0, margin: 0}}>
-            {this.state.datas.map((data) => {
+            {this.state.messages.map((message) => {
               return(
                 <li style={{listStyle: 'none'}}><a href="#">
                   <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
                     <div style={{width: 50, height: 50, overflow: 'hidden'}}>
                       <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
                     </div>
-                    <div className="message" style={{  }}>
-                      <p>{ data }</p>
+                    <div className="message">
+                      <p>{ message.text }</p>
                     </div>
                   </div>
                 </a></li>
