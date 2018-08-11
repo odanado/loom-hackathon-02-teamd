@@ -3,7 +3,7 @@ import {
 } from 'loom-js'
 
 import Web3 from 'web3'
-import SimpleStore from './contracts/SimpleStore.json'
+import ChatRoom from './contracts/ChatRoom.json'
 
 export default class Contract {
   async loadContract() {
@@ -39,18 +39,18 @@ export default class Contract {
 
   async _createContractInstance() {
     const networkId = await this._getCurrentNetwork()
-    this.currentNetwork = SimpleStore.networks[networkId]
+    this.currentNetwork = ChatRoom.networks[networkId]
 
     if (!this.currentNetwork) {
       throw Error('Contract not deployed on DAppChain')
     }
 
-    const ABI = SimpleStore.abi
-    this.simpleStoreInstance = new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
+    const ABI = ChatRoom.abi
+    this.chatRoomInstance = new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
       from: this.currentUserAddress
     })
 
-    this.simpleStoreInstance.events.NewValueSet({ filter: { _value: 10 }}, (err, event) => {
+    this.chatRoomInstance.events.NewValueSet({ filter: { _value: 10 }}, (err, event) => {
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {
@@ -59,7 +59,7 @@ export default class Contract {
       }
     })
 
-    this.simpleStoreInstance.events.NewValueSetAgain({ filter: { _value: 47 }}, (err, event) => {
+    this.chatRoomInstance.events.NewValueSetAgain({ filter: { _value: 47 }}, (err, event) => {
       if (err) console.error('Error on event', err)
       else {
         setTimeout(() => alert("Loooomy help me :)"))
@@ -78,21 +78,26 @@ export default class Contract {
     return await this.web3.eth.net.getId()
   }
 
-  async setValue(value) {
-    // Just a small test with Loomy
-    if (value == 47) {
-      return await this.simpleStoreInstance.methods.setAgain(value).send({
-        from: this.currentUserAddress
-      })
-    }
-
-    return await this.simpleStoreInstance.methods.set(value).send({
+  async sendText(text) {
+    return await this.chatRoomInstance.methods.sendText(text).send({
       from: this.currentUserAddress
     })
   }
 
-  async getValue() {
-    return await this.simpleStoreInstance.methods.get().call({
+  async getMessagesCount() {
+    return await this.chatRoomInstance.methods.getMessagesCount().send({
+      from: this.currentUserAddress
+    })
+  }
+
+  async getMessage(user, index) {
+    return await this.chatRoomInstance.methods.getMessage(user, index).send({
+      from: this.currentUserAddress
+    })
+  }
+
+  async getUsers(user, index) {
+    return await this.chatRoomInstance.methods.getUsers().send({
       from: this.currentUserAddress
     })
   }
