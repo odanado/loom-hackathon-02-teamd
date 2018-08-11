@@ -27,11 +27,11 @@ contract('ChatRoom', (accounts) => {
     await chatRoom.sendText('b', {from: accounts[0]})
 
     {
-        const [ text, timestamp ] = await chatRoom.getMessage.call(accounts[0], 0)
+        const [ text, stampToken, timestamp ] = await chatRoom.getMessage.call(accounts[0], 0)
         assert.equal(text, 'a')
     }
     {
-        const [ text, timestamp ] = await chatRoom.getMessage.call(accounts[0], 1)
+        const [ text, stampToken, timestamp ] = await chatRoom.getMessage.call(accounts[0], 1)
         assert.equal(text, 'b')
     }
   })
@@ -53,5 +53,12 @@ contract('ChatRoom', (accounts) => {
       const count2 = await chatRoom.balanceOf.call(accounts[1])
       assert.equal(count1.toNumber(), 3)
       assert.equal(count2.toNumber(), 0)
+  })
+
+  it('トークンの送信', async () => {
+      await chatRoom.sendStamp(1, {from: accounts[0]})
+      await chatRoom.sendText('a', {from: accounts[0]})
+      const count = await chatRoom.getMessagesCount.call({from: accounts[0]})
+      assert.equal(count.toNumber(), 2)
   })
 })
