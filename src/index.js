@@ -20,19 +20,22 @@ const Index = class Index extends React.Component {
       messages: [],
       isStamp: false
     }
-
-    this.onModalStamp = this.onModalStamp.bind(this);
   }
 
   async componentWillMount() {
     await this.contract.loadContract()
-    this.setState({
-      messages: [{stamp: '#f00'}]
-    })
     this.contract.addEventListener((v) => {
+      console.log(v);
       this.setState({
         messages: [...this.state.messages, {
           text: v.text,
+          timestamp: v.timestamp
+        }]
+      })
+    })
+    this.contract.addOnMintColorStampToken((v) => {
+      this.setState({
+        messages: [...this.state.messages, {
           stamp: v.stamp,
           timestamp: v.timestamp
         }]
@@ -42,14 +45,13 @@ const Index = class Index extends React.Component {
 
   onChangeHandler(event) {
     this.value = event.target.value
-    const isValid = (this.value.length > 0) && (this.value.length < 140)
+    const isValid = this.value.length < 140
     this.setState({ isValid })
   }
 
   async confirmValue() {
     this.setState({isSending: true})
     try {
-      //  ここでmessage送る
       const tx = await this.contract.sendText(this.value)
       this.textInput.current.value = ''
       this.setState({ tx, isValid: false })
@@ -59,15 +61,17 @@ const Index = class Index extends React.Component {
     this.setState({isSending: false})
   }
 
-  onSelected(stamp) {
-    console.log(stamp);
-  }
 
-  onModalStamp() {
-    this.setState({
-      isStamp: true,
-    });
-  }
+  // async SendStamp(stamp) {
+  //   this.setState({isSending: true})
+  //   try {
+  //     const tx = await this.contract.mintColorStampToken()
+  //     this.setState({ tx })
+  //   } catch (err) {
+  //     console.error('Ops, some error happen:', err)
+  //   }
+  //   this.setState({isSending: false})
+  // }
 
   render() {
     const loomyAlert = (
@@ -113,32 +117,32 @@ const Index = class Index extends React.Component {
               })}
             </ul>
           </div>
-
-          {
-            this.state.isStamp
-              ? (<div className="stamp-area" style={{padding: 20, backgroudColor: 'rgba(51,51,51,0.5', zIndex: 99}}>
-                  <ul style={{padding: 0, margin: 0}}>
-                    {this.state.messages.reverse().map((message) => {
-                      if (message.stamp) {
-                        return(
-                          <li style={{listStyle: 'none'}}>
-                            <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                              <div style={{width: 50, height: 50, overflow: 'hidden', background: message.stamp}}>
-                              </div>
-                              <p>{ message.stamp }</p>
-                            </div>
-                          </li>
-                        );
-                      }
-                    })}
-                  </ul>
-                </div>)
-              : null
-          }
         </div>
 
+        {
+          this.state.isStamp
+            ? (<div className="stamp-area" style={{top: '25%', left: '25%', width: 100, height: 100, padding: 20, backgroudColor: 'rgba(51,51,51,0.5', zIndex: 99}}>
+                <ul style={{padding: 0, margin: 0}}>
+                  {this.state.messages.reverse().map((message) => {
+                    if (message.stamp) {
+                      return(
+                        <li style={{listStyle: 'none'}} onClick={this.SendStamp(message.stamp)}>
+                          <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                            <div style={{width: 50, height: 50, overflow: 'hidden', background: message.stamp}}>
+                            </div>
+                            <p>{ message.stamp }</p>
+                          </div>
+                        </li>
+                      );
+                    }
+                  })}
+                </ul>
+              </div>)
+            : null
+        }
+
         <div className="input-area">
-          <p onClick={this.onModalStamp}>スタンプ</p>
+          <p>スタンプ</p>
           <form onSubmit={e => { e.preventDefault(); }}>
             <div className="form-group" style={{display: 'inline-block'}}>
               <div className="input" style={{display: 'inline-block', width: '65%'}}>

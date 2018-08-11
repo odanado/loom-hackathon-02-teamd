@@ -8,6 +8,7 @@ import ChatRoom from './contracts/ChatRoom.json'
 export default class Contract {
   async loadContract() {
     this.onEvent = null
+    this.onMintColorStampToken = null
     this._createClient()
     this._createCurrentUserAddress()
     this._createWebInstance()
@@ -51,6 +52,7 @@ export default class Contract {
     })
 
     this.chatRoomInstance.events.SendText({}, (err, event) => {
+      console.log(event)
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {
