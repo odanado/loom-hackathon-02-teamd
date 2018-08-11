@@ -51,8 +51,10 @@ export default class Contract {
       from: this.currentUserAddress
     })
 
-    this.chatRoomInstance.events.SendText({}, (err, event) => {
-      console.log(event)
+    this.chatRoomInstance.events.SendText({
+      fromBlock: 0,
+      toBlock: 'latest'
+    }, (err, event) => {
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {
@@ -61,10 +63,13 @@ export default class Contract {
       }
     })
 
-    this.chatRoomInstance.events.MintColorStampToken({}, (err, event) => {
+    this.chatRoomInstance.events.MintColorStampToken({
+      fromBlock: 0,
+      toBlock: 'latest'
+    }, (err, event) => {
       if (err) console.error('Error on event', err)
       else {
-        if (this.onEvent) {
+        if (this.onMintColorStampToken) {
           this.onMintColorStampToken(event.returnValues)
         }
       }

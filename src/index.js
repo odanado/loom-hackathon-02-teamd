@@ -25,7 +25,6 @@ const Index = class Index extends React.Component {
   async componentWillMount() {
     await this.contract.loadContract()
     this.contract.addEventListener((v) => {
-      console.log(v);
       this.setState({
         messages: [...this.state.messages, {
           text: v.text,
@@ -49,12 +48,29 @@ const Index = class Index extends React.Component {
     this.setState({ isValid })
   }
 
-  async confirmValue() {
+  compare(a, b) {
+    const genreA = a.timestamp;
+    const genreB = b.timestamp;
+
+    let comparison = 0;
+    if (genreA > genreB) {
+      comparison = 1;
+    } else if (genreA < genreB) {
+      comparison = -1;
+    }
+    return comparison * -1;
+  }
+
+  async SendText() {
     this.setState({isSending: true})
     try {
       const tx = await this.contract.sendText(this.value)
+      console.log(tx);
       this.textInput.current.value = ''
-      this.setState({ tx, isValid: false })
+      this.setState({
+        tx,
+        isValid: false
+      })
     } catch (err) {
       console.error('Ops, some error happen:', err)
     }
@@ -101,7 +117,7 @@ const Index = class Index extends React.Component {
           <div className="message-area">
             <h2>タイムライン</h2>
             <ul style={{padding: 0, margin: 0}}>
-              {this.state.messages.reverse().map((message) => {
+              {this.state.messages.sort(this.comparison).map((message) => {
                 return(
                   <li style={{listStyle: 'none'}}><a href="#">
                     <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
@@ -118,12 +134,12 @@ const Index = class Index extends React.Component {
             </ul>
           </div>
         </div>
-
+{/*
         {
           this.state.isStamp
             ? (<div className="stamp-area" style={{top: '25%', left: '25%', width: 100, height: 100, padding: 20, backgroudColor: 'rgba(51,51,51,0.5', zIndex: 99}}>
                 <ul style={{padding: 0, margin: 0}}>
-                  {this.state.messages.reverse().map((message) => {
+                  {this.state.messages.sort(-1).map((message) => {
                     if (message.stamp) {
                       return(
                         <li style={{listStyle: 'none'}} onClick={this.SendStamp(message.stamp)}>
@@ -139,7 +155,7 @@ const Index = class Index extends React.Component {
                 </ul>
               </div>)
             : null
-        }
+        }*/}
 
         <div className="input-area">
           <p>スタンプ</p>
@@ -148,7 +164,7 @@ const Index = class Index extends React.Component {
               <div className="input" style={{display: 'inline-block', width: '65%'}}>
                 <input type="text" className="form-control" onChange={(event) => this.onChangeHandler(event)} ref={this.textInput}/>
               </div>
-              <button style={{display: 'inline-block', marginLeft: 10}} type="button" disabled={!this.state.isValid || this.state.isSending} className="btn btn-primary" onClick={() => this.confirmValue()}>Confirm</button>
+              <button style={{display: 'inline-block', marginLeft: 10}} type="button" disabled={!this.state.isValid || this.state.isSending} className="btn btn-primary" onClick={() => this.SendText()}>Confirm</button>
             </div>
           </form>
         </div>
