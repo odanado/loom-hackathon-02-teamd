@@ -36,10 +36,10 @@ const Index = class Index extends React.Component {
   async confirmValue() {
     this.setState({isSending: true})
     try {
+      //  ここでmessage送る
       const tx = await this.contract.setValue(this.value)
-      const tries = this.state.tries + 1
       this.textInput.current.value = ''
-      this.setState({ tx, tries, isValid: false })
+      this.setState({ tx, isValid: false })
     } catch (err) {
       console.error('Ops, some error happen:', err)
     }
@@ -53,24 +53,62 @@ const Index = class Index extends React.Component {
       </div>
     )
 
-    return (
-      <div className="container" style={{ marginTop: 10 }}>
-        <form onSubmit={e => { e.preventDefault(); }}>
-          <div className="form-group">
-            <label>Value</label>
-            <input type="number" className="form-control" onChange={(event) => this.onChangeHandler(event)} ref={this.textInput}/>
-            <small className="form-text text-muted">Set a number</small>
+    if (this.state.isSending) {
+      return(
+        <div style={{position: 'fixed', width: '100%', height: '100%', background: 'rgba(51,51,51,0.5)' }}>
+          <div style={{flex: 1}}>
+            <p>Sending</p>
           </div>
-          <button type="button" disabled={!this.state.isValid || this.state.isSending} className="btn btn-primary" onClick={() => this.confirmValue()}>Confirm</button>
-        </form>
-        <div className="alert alert-success">
-          Value set is {this.state.value} (this value only updates if values is 10 or ...)
         </div>
-        { this.state.tries === 3 && loomyAlert }
-        <hr />
-        <pre>
-          {this.state.tx && JSON.stringify(this.state.tx, null, 2)}
-        </pre>
+      );
+    }
+
+    return (
+      <div className="container" style={{ marginTop: 10, width: '60%', marginHorizontal: 'auto', position: 'relative' }}>
+
+        <header id="header">
+          <h1>Loom Stamp Chat</h1>
+        </header>
+
+        <div className="input-area" style={{
+        }}>
+
+          <ul style={{padding: 0, margin: 0}}>
+            <li style={{listStyle: 'none'}}><a href="#">
+              <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                <div style={{width: 50, height: 50, overflow: 'hidden'}}>
+                  <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
+                </div>
+                <div className="message" style={{  }}>
+                  <p>fefe</p>
+                </div>
+              </div>
+            </a></li>
+            <li style={{listStyle: 'none'}}><a href="#">
+              <div style={{ display: 'flex', alignItems: 'flex-start', alignSelf: 'flex-start' }}>
+                <div style={{width: 50, height: 50, overflow: 'hidden'}}>
+                  <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
+                </div>
+                <div className="message" style={{ alignSelf: 'center' }}>
+                  <p>fefe</p>
+                </div>
+              </div>
+            </a></li>
+          </ul>
+
+        </div>
+
+        <div className="input-area">
+          <form onSubmit={e => { e.preventDefault(); }}>
+            <div className="form-group" style={{display: 'inline-block'}}>
+              <div className="input" style={{display: 'inline-block', width: '65%'}}>
+                <input type="text" className="form-control" onChange={(event) => this.onChangeHandler(event)} ref={this.textInput}/>
+              </div>
+              <button style={{display: 'inline-block', marginLeft: 10}} type="button" disabled={!this.state.isValid || this.state.isSending} className="btn btn-primary" onClick={() => this.confirmValue()}>Confirm</button>
+            </div>
+          </form>
+        </div>
+
       </div>
     )
   }
