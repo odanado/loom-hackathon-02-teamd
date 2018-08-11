@@ -16,20 +16,21 @@ const Index = class Index extends React.Component {
       isValid: false,
       isSending: false,
       tx: null,
-      tries: 0
+      tries: 0,
+      messages: []
     }
   }
 
   async componentWillMount() {
     await this.contract.loadContract()
     this.contract.addEventListener((v) => {
-      this.setState({ value: v._value })
+      console.log(v)
     })
   }
 
   onChangeHandler(event) {
     this.value = event.target.value
-    const isValid = this.value > 0
+    const isValid = this.value.length < 140
     this.setState({ isValid })
   }
 
@@ -37,7 +38,7 @@ const Index = class Index extends React.Component {
     this.setState({isSending: true})
     try {
       //  ここでmessage送る
-      const tx = await this.contract.setValue(this.value)
+      const tx = await this.contract.sendText(this.value)
       this.textInput.current.value = ''
       this.setState({ tx, isValid: false })
     } catch (err) {

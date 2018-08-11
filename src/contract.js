@@ -40,7 +40,9 @@ export default class Contract {
   async _createContractInstance() {
     const networkId = await this._getCurrentNetwork()
     this.currentNetwork = ChatRoom.networks[networkId]
-
+    console.log(networkId)
+    console.log(ChatRoom)
+    console.log(ChatRoom.networks)
     if (!this.currentNetwork) {
       throw Error('Contract not deployed on DAppChain')
     }
@@ -50,7 +52,8 @@ export default class Contract {
       from: this.currentUserAddress
     })
 
-    this.chatRoomInstance.events.NewValueSet({ filter: { _value: 10 }}, (err, event) => {
+    this.chatRoomInstance.events.SendText({}, (err, event) => {
+      console.log('SendText')
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {
@@ -59,18 +62,10 @@ export default class Contract {
       }
     })
 
-    this.chatRoomInstance.events.NewValueSetAgain({ filter: { _value: 47 }}, (err, event) => {
-      if (err) console.error('Error on event', err)
-      else {
-        setTimeout(() => alert("Loooomy help me :)"))
-        if (this.onEvent) {
-          this.onEvent(event.returnValues)
-        }
-      }
-    })
   }
 
   addEventListener(fn) {
+    console.log('addEventListener')
     this.onEvent = fn
   }
 
