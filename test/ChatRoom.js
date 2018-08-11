@@ -44,4 +44,14 @@ contract('ChatRoom', (accounts) => {
     assert.equal(accounts[0], users[0])
     assert.equal(accounts[1], users[1])
   })
+
+  it('トークンを発行できる', async() => {
+      await chatRoom.mintColorStampToken({from: accounts[0]})
+      await chatRoom.mintColorStampToken({from: accounts[0]})
+      await chatRoom.mintColorStampToken({from: accounts[0]})
+      const count1 = await chatRoom.balanceOf.call(accounts[0])
+      const count2 = await chatRoom.balanceOf.call(accounts[1])
+      assert.equal(count1.toNumber(), 3)
+      assert.equal(count2.toNumber(), 0)
+  })
 })

@@ -1,6 +1,8 @@
 pragma solidity ^0.4.22;
 
-contract ChatRoom {
+import "./ColorStampToken.sol";
+
+contract ChatRoom is ColorStampToken{
     struct Message {
         string text;
         uint timestamp;
