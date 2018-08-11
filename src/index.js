@@ -17,12 +17,18 @@ const Index = class Index extends React.Component {
       isSending: false,
       tx: null,
       tries: 0,
-      messages: []
+      messages: [],
+      isStamp: false
     }
+
+    this.onModalStamp = this.onModalStamp.bind(this);
   }
 
   async componentWillMount() {
     await this.contract.loadContract()
+    this.setState({
+      messages: [{stamp: '#f00'}]
+    })
     this.contract.addEventListener((v) => {
       this.setState({
         messages: [...this.state.messages, {
@@ -36,7 +42,7 @@ const Index = class Index extends React.Component {
 
   onChangeHandler(event) {
     this.value = event.target.value
-    const isValid = this.value.length < 140
+    const isValid = (this.value.length > 0) && (this.value.length < 140)
     this.setState({ isValid })
   }
 
@@ -53,6 +59,16 @@ const Index = class Index extends React.Component {
     this.setState({isSending: false})
   }
 
+  onSelected(stamp) {
+    console.log(stamp);
+  }
+
+  onModalStamp() {
+    this.setState({
+      isStamp: true,
+    });
+  }
+
   render() {
     const loomyAlert = (
       <div className="alert alert-warning">
@@ -63,8 +79,8 @@ const Index = class Index extends React.Component {
     if (this.state.isSending) {
       return(
         <div style={{position: 'fixed', width: '100%', height: '100%', background: 'rgba(51,51,51,0.5)' }}>
-          <div style={{flex: 1}}>
-            <p>Sending</p>
+          <div style={{flex: 1, alignSelf: 'center', alignItems: 'center'}}>
+            <p>Sending...</p>
           </div>
         </div>
       );
@@ -77,30 +93,52 @@ const Index = class Index extends React.Component {
           <h1>Loom Stamp Chat</h1>
         </header>
 
-        <div className="input-area" style={{
-        }}>
-
-
-
-          <ul style={{padding: 0, margin: 0}}>
-            {this.state.messages.map((message) => {
-              return(
-                <li style={{listStyle: 'none'}}><a href="#">
-                  <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                    <div style={{width: 50, height: 50, overflow: 'hidden'}}>
-                      <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
+        <div className="contaier">
+          <div className="message-area">
+            <h2>タイムライン</h2>
+            <ul style={{padding: 0, margin: 0}}>
+              {this.state.messages.reverse().map((message) => {
+                return(
+                  <li style={{listStyle: 'none'}}><a href="#">
+                    <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                      <div style={{width: 50, height: 50, overflow: 'hidden'}}>
+                        <img src="https://qiita-image-store.s3.amazonaws.com/0/73130/profile-images/1473699397" alt="" style={{borderRaidus: 50, width: '100%', height: '100%'}}/>
+                      </div>
+                      <div className="message">
+                        <p>{ message.text }</p>
+                      </div>
                     </div>
-                    <div className="message">
-                      <p>{ message.text }</p>
-                    </div>
-                  </div>
-                </a></li>
-              );
-            })}
-          </ul>
+                  </a></li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {
+            this.state.isStamp
+              ? (<div className="stamp-area" style={{padding: 20, backgroudColor: 'rgba(51,51,51,0.5', zIndex: 99}}>
+                  <ul style={{padding: 0, margin: 0}}>
+                    {this.state.messages.reverse().map((message) => {
+                      if (message.stamp) {
+                        return(
+                          <li style={{listStyle: 'none'}}>
+                            <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                              <div style={{width: 50, height: 50, overflow: 'hidden', background: message.stamp}}>
+                              </div>
+                              <p>{ message.stamp }</p>
+                            </div>
+                          </li>
+                        );
+                      }
+                    })}
+                  </ul>
+                </div>)
+              : null
+          }
         </div>
 
         <div className="input-area">
+          <p onClick={this.onModalStamp}>スタンプ</p>
           <form onSubmit={e => { e.preventDefault(); }}>
             <div className="form-group" style={{display: 'inline-block'}}>
               <div className="input" style={{display: 'inline-block', width: '65%'}}>
@@ -110,6 +148,7 @@ const Index = class Index extends React.Component {
             </div>
           </form>
         </div>
+
 
       </div>
     )
