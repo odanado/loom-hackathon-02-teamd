@@ -24,7 +24,13 @@ const Index = class Index extends React.Component {
   async componentWillMount() {
     await this.contract.loadContract()
     this.contract.addEventListener((v) => {
-      console.log(v)
+      this.setState({
+        messages: [...this.state.messages, {
+          text: v.text,
+          stamp: v.stamp,
+          timestamp: v.timestamp
+        }]
+      })
     })
   }
 

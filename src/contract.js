@@ -53,7 +53,6 @@ export default class Contract {
     })
 
     this.chatRoomInstance.events.SendText({}, (err, event) => {
-      console.log('SendText')
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {
