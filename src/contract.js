@@ -40,9 +40,7 @@ export default class Contract {
   async _createContractInstance() {
     const networkId = await this._getCurrentNetwork()
     this.currentNetwork = ChatRoom.networks[networkId]
-    console.log(networkId)
-    console.log(ChatRoom)
-    console.log(ChatRoom.networks)
+
     if (!this.currentNetwork) {
       throw Error('Contract not deployed on DAppChain')
     }
@@ -61,11 +59,22 @@ export default class Contract {
       }
     })
 
+    this.chatRoomInstance.events.MintColorStampToken({}, (err, event) => {
+      if (err) console.error('Error on event', err)
+      else {
+        if (this.onEvent) {
+          this.onMintColorStampToken(event.returnValues)
+        }
+      }
+    })
+
   }
 
   addEventListener(fn) {
-    console.log('addEventListener')
     this.onEvent = fn
+  }
+  addOnMintColorStampToken(fn) {
+    this.onMintColorStampToken = fn
   }
 
   async _getCurrentNetwork() {
@@ -94,5 +103,13 @@ export default class Contract {
     return await this.chatRoomInstance.methods.getUsers().send({
       from: this.currentUserAddress
     })
+  }
+
+  async getColorStampCount() {
+    return await this.chatRoomInstance.methods.balanceOf(this.currentUserAddress).send({ from: this.currentUserAddress })
+  }
+
+  async mintColorStampToken() {
+    return await this.chatRoomInstance.methods.mintColorStampToken().send({ from: this.currentUserAddress })
   }
 }
