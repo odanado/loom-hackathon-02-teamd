@@ -12,28 +12,33 @@ contract('ChatRoom', (accounts) => {
   });
 
   it('メッセージを送信できる', async () => {
-      const message = 'a'
-      const tx = await chatRoom.sendMessage(message, {from: accounts[0]})
-      assert.equal(tx.logs[0].args.message, message)
+      const text = 'a'
+      const tx = await chatRoom.sendText(text, {from: accounts[0]})
   })
   it('メッセージの総数を取得できる', async () => {
-      await chatRoom.sendMessage('a', {from: accounts[0]})
-      await chatRoom.sendMessage('a', {from: accounts[0]})
+      await chatRoom.sendText('a', {from: accounts[0]})
+      await chatRoom.sendText('a', {from: accounts[0]})
       const count = await chatRoom.getMessagesCount.call({from: accounts[0]})
       assert.equal(count.toNumber(), 2)
   })
 
   it('メッセージを取得できる', async () => {
-    await chatRoom.sendMessage('a', {from: accounts[0]})
-    await chatRoom.sendMessage('b', {from: accounts[0]})
+    await chatRoom.sendText('a', {from: accounts[0]})
+    await chatRoom.sendText('b', {from: accounts[0]})
 
-    assert.equal(await chatRoom.getMessage.call(accounts[0], 0), 'a')
-    assert.equal(await chatRoom.getMessage.call(accounts[0], 1), 'b')
+    {
+        const [ text, timestamp ] = await chatRoom.getMessage.call(accounts[0], 0)
+        assert.equal(text, 'a')
+    }
+    {
+        const [ text, timestamp ] = await chatRoom.getMessage.call(accounts[0], 1)
+        assert.equal(text, 'b')
+    }
   })
 
   it('ユーザ一覧を取得できる', async() => {
-    await chatRoom.sendMessage('a', {from: accounts[0]})
-    await chatRoom.sendMessage('b', {from: accounts[1]})
+    await chatRoom.sendText('a', {from: accounts[0]})
+    await chatRoom.sendText('b', {from: accounts[1]})
 
     const users = await chatRoom.getUsers.call()
     assert.equal(accounts[0], users[0])
