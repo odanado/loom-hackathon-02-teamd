@@ -3,7 +3,7 @@ pragma solidity ^0.4.23;
 import "openzeppelin-solidity/contracts/token/ERC721/ERC721Token.sol";
 
 contract ColorStampToken is ERC721Token {
-  uint256 internal nextTokenId = 0;
+  uint256 internal nextTokenId = 1;
 
   event MintColorStampToken(uint256 tokenId, address sender);
 
