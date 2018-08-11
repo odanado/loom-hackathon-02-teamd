@@ -51,10 +51,8 @@ export default class Contract {
     this.chatRoomInstance = new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
       from: this.currentUserAddress
     })
-    console.log('poyo', this.chatRoomInstance.events)
 
     this.chatRoomInstance.events.SendText({}, (err, event) => {
-      console.log('SendText')
       if (err) console.error('Error on event', err)
       else {
         if (this.onEvent) {

@@ -9,7 +9,7 @@ contract ChatRoom {
     mapping(address => Message[]) internal messages;
     address[] internal users;
 
-    event SendText(string text, address sender);
+    event SendText(string text, uint timestamp, address sender);
 
     function isuser(address sender) public view returns (bool) {
         return messages[sender].length > 0;
@@ -21,7 +21,7 @@ contract ChatRoom {
         }
         Message memory message = Message(text, now);
         messages[msg.sender].push(message);
-        emit SendText(message.text, msg.sender);
+        emit SendText(message.text, message.timestamp, msg.sender);
     }
 
     function getMessagesCount() public view returns (uint256) {
