@@ -94,6 +94,12 @@ export default class Contract {
     })
   }
 
+    async sendStamp(stamp) {
+    return await this.chatRoomInstance.methods.sendStamp(stamp).send({
+      from: this.currentUserAddress
+    })
+  }
+
   async getMessagesCount() {
     return await this.chatRoomInstance.methods.getMessagesCount().send({
       from: this.currentUserAddress

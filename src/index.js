@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom'
 import Contract from './contract'
 import createKeccakHash from 'keccak'
 
+const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
+
 const Index = class Index extends React.Component {
   constructor(props) {
     super(props)
@@ -20,25 +22,28 @@ const Index = class Index extends React.Component {
       messages: [
         {timestamp: 0, stamp: 1}
       ],
+      stamps: [],
       isStamp: false
     }
   }
 
   async componentWillMount() {
     await this.contract.loadContract()
+    
     this.contract.addEventListener((v) => {
       this.setState({
         messages: [...this.state.messages, {
-          text: v.text,
+          text: v.text === "" ? null : v.text,
+          stamp: v.stampToken === "0" ? null : v.stampToken,
           timestamp: v.timestamp
         }]
       })
     })
+
     this.contract.addOnMintColorStampToken((v) => {
       this.setState({
-        messages: [...this.state.messages, {
-          stamp: v.stamp,
-          timestamp: v.timestamp
+        stamps: [...this.state.stamps, {
+          id: v.tokenId
         }]
       })
     })
@@ -78,6 +83,7 @@ const Index = class Index extends React.Component {
     } catch (err) {
       console.error('Ops, some error happen:', err)
     }
+    await sleep(100)
     this.setState({isSending: false})
   }
 
@@ -85,13 +91,22 @@ const Index = class Index extends React.Component {
   async SendStamp(stamp) {
     this.setState({isSending: true})
     try {
-      const tx = await this.contract.mintColorStampToken()
-      this.setState({
-        isValid: false
-      })
+      const tx = await this.contract.sendStamp(stamp)
     } catch (err) {
       console.error('Ops, some error happen:', err)
     }
+    await sleep(100)
+    this.setState({isSending: false})
+  }
+
+  async MintColorStampToken() {
+    this.setState({isSending: true})
+    try {
+      const tx = await this.contract.mintColorStampToken()
+    } catch (err) {
+      console.error('Ops, some error happen:', err)
+    }
+    await sleep(100)
     this.setState({isSending: false})
   }
 
@@ -119,7 +134,7 @@ const Index = class Index extends React.Component {
           <h1>Loom Stamp Chat</h1>
         </header>
 
-        <div className="contaier">
+        <div className="contaier" style={{ display: 'inline-block', width: '45%' }}>
           <div className="message-area">
             <h2>タイムライン</h2>
             <ul style={{padding: 0, margin: 0}}>
@@ -148,31 +163,24 @@ const Index = class Index extends React.Component {
             </ul>
           </div>
         </div>
-{/*
-        {
-          this.state.isStamp
-            ? (<div className="stamp-area" style={{top: '25%', left: '25%', width: 100, height: 100, padding: 20, backgroudColor: 'rgba(51,51,51,0.5', zIndex: 99}}>
-                <ul style={{padding: 0, margin: 0}}>
-                  {this.state.messages.sort(-1).map((message) => {
-                    if (message.stamp) {
-                      return(
-                        <li style={{listStyle: 'none'}} onClick={this.SendStamp(message.stamp)}>
-                          <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
-                            <div style={{width: 50, height: 50, overflow: 'hidden', background: message.stamp}}>
-                            </div>
-                            <p>{ message.stamp }</p>
-                          </div>
-                        </li>
-                      );
-                    }
-                  })}
-                </ul>
-              </div>)
-            : null
-        }*/}
+
+        <div className="stamp-area" style={{ display: 'inline-block', width: '45%', verticalAlign: 'top' }}>
+          <h2>スタンプ</h2>
+          <ul style={{padding: 0, margin: 0}}>
+            {this.state.stamps.map((stamp) => {
+              return(
+                <li style={{listStyle: 'none'}} onClick={() => this.SendStamp(stamp.id)}>
+                  <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'center' }}>
+                    <div style={{width: 50, height: 50, overflow: 'hidden', marginTop: 16, backgroundColor: this.getDNA(stamp.id)}}>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         <div className="input-area">
-          <p>スタンプ</p>
           <form onSubmit={e => { e.preventDefault(); }}>
             <div className="form-group" style={{display: 'inline-block'}}>
               <div className="input" style={{display: 'inline-block', width: '65%'}}>
@@ -182,6 +190,14 @@ const Index = class Index extends React.Component {
             </div>
           </form>
         </div>
+
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => this.MintColorStampToken()}
+        >
+          スタンプ生成
+        </button>
 
 
       </div>
